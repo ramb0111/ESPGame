@@ -2,7 +2,7 @@
 
 ESP-Game App
 
-### Screenshots
+### Submitted To
 
 ![squad-run-logo](https://squadrun.co/wp-content/uploads/2016/10/sr-fb.png)
 
@@ -36,17 +36,17 @@ ESP-Game App
   ```
 
 6. Create Database and User
-   ```
-   $ CREATE DATABASE Game;
-   $ CREATE USER tester WITH PASSWORD 'password' CREATEDB SUPERUSER;
-   $ GRANT ALL PRIVILEGES ON DATABASE "Game" to tester;
-   ```
+  ```
+  $ CREATE DATABASE Game;
+  $ CREATE USER tester WITH PASSWORD 'password' CREATEDB SUPERUSER;
+  $ GRANT ALL PRIVILEGES ON DATABASE "Game" to tester;
+  ```
 
 7. Copy paste the following credentials to ~/.bashrc
-   ```
+  ```
 
-   $ source ~/.bashrc
-   ```
+  $ source ~/.bashrc
+  ```
 
 5. Run the development server:
   ```
