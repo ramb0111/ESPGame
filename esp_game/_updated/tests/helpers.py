@@ -1,7 +1,7 @@
 import json
 import unittest
 
-from app import create_app
+from esp_game.app import create_app
 
 
 class TestClient(object):

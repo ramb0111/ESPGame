@@ -2,7 +2,7 @@ import logging
 
 from flask import Flask, request as req
 
-from app.controllers import pages
+from esp_game.app import pages
 
 
 def create_app(config_filename):

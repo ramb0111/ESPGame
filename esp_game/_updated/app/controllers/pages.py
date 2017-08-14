@@ -1,5 +1,6 @@
 from flask import render_template, Blueprint, request
-from app.forms import *
+
+from esp_game.app import *
 
 blueprint = Blueprint('pages', __name__)
 

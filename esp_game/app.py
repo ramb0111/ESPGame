@@ -2,19 +2,15 @@
 # Imports
 #----------------------------------------------------------------------------#
 
-from flask import Flask, render_template, request
-# from flask.ext.sqlalchemy import SQLAlchemy
 import logging
 from logging import Formatter, FileHandler
-from forms import *
-import os
 
-#----------------------------------------------------------------------------#
-# App Config.
-#----------------------------------------------------------------------------#
+from flask import render_template, request
 
-app = Flask(__name__)
-app.config.from_object('config')
+from esp_game import app
+from esp_game.models import init_db
+from esp_game.forms import *
+
 #db = SQLAlchemy(app)
 
 # Automatically tear down SQLAlchemy.
@@ -40,24 +36,24 @@ def login_required(test):
 # Controllers.
 #----------------------------------------------------------------------------#
 
-
-@app.route('/')
-def home():
-    return render_template('pages/placeholder.home.html')
+#
+#
+# def home():
+#     return render_template('pages/placeholder.home.html')
 
 
 @app.route('/about')
 def about():
     return render_template('pages/placeholder.about.html')
 
-
+@app.route('/')
 @app.route('/login')
 def login():
     form = LoginForm(request.form)
     return render_template('forms/login.html', form=form)
 
 
-@app.route('/register')
+@app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm(request.form)
     return render_template('forms/register.html', form=form)
@@ -97,11 +93,6 @@ if not app.debug:
 
 # Default port:
 if __name__ == '__main__':
-    app.run()
+    init_db()
+    app.run(use_reloader=True)
 
-# Or specify port manually:
-'''
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
-'''

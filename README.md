@@ -35,16 +35,25 @@ ESP-Game App
   $ sudo -i -u postgres psql
   ```
 
-6. Create Database and User
+6. Create Database and User:
   ```
-  $ CREATE DATABASE Game;
-  $ CREATE USER tester WITH PASSWORD 'password' CREATEDB SUPERUSER;
-  $ GRANT ALL PRIVILEGES ON DATABASE "Game" to tester;
-  ```
-
-7. Copy paste the following credentials to ~/.bashrc
+  postgres=# CREATE DATABASE game;
+  postgres=# CREATE USER tester WITH PASSWORD 'password';
+  postgres=# GRANT ALL PRIVILEGES ON DATABASE game to tester;
+  postgres=# \q
   ```
 
+7. Copy paste the Database credentials to ~/.bashrc:
+  ```
+    export GM_DB_USER='tester'
+    export GM_DB_PASSWORD='password'
+    export GM_DB_HOST='localhost'
+    export GM_DB_PORT='5432'
+    export GM_DB_NAME='game'
+  ```
+
+8. To reflect the changes in bashrc , Source it:
+  ```
   $ source ~/.bashrc
   ```
 

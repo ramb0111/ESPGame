@@ -10,5 +10,10 @@ DEBUG = True
 # http://clsc.net/tools-old/random-string-generator.php
 SECRET_KEY = 'my precious'
 
-# Connect to the database
-SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'database.db')
+
+# Database Environment Variables
+GM_DB_USER = os.environ['GM_DB_USER']
+GM_DB_PASSWORD = os.environ['GM_DB_PASSWORD']
+GM_DB_HOST = os.environ["GM_DB_HOST"]
+GM_DB_PORT = os.environ["GM_DB_PORT"]
+GM_DB_NAME = os.environ["GM_DB_NAME"]
