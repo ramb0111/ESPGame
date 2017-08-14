@@ -1,4 +1,5 @@
 import datetime
+from enum import Enum
 
 from esp_game import db
 
@@ -47,7 +48,7 @@ class Task(db.Model):
     player2_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     player1_answer_count = db.Column(db.Integer, nullable=False, default=0)
     player2_answer_count = db.Column(db.Integer, nullable=False, default=0)
-    status = db.Column(db.Enum('init', 'success', 'fail'), nullable=False, default=True)
+    status = db.Column(db.Enum(Enum('init', 'success', 'fail')), nullable=False, default=True)
     created_on = db.Column(db.DateTime, nullable=False)
 
     def __init__(self, player_id):
@@ -58,8 +59,8 @@ class Task(db.Model):
 
 class PrimarySecondaryMapping(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    primary_id = db.Column(db.Integer, db.ForeignKey('primaryimage.id'))
-    secondary_id = db.Column(db.Integer, db.ForeignKey('secondaryimage.id'))
+    primary_id = db.Column(db.Integer, db.ForeignKey('primary_image.id'))
+    secondary_id = db.Column(db.Integer, db.ForeignKey('secondary_image.id'))
     related_votes = db.Column(db.Integer, nullable=False, default=0)
 
     def __init__(self, primary_id, secondary_id, related_votes):
@@ -70,9 +71,9 @@ class PrimarySecondaryMapping(db.Model):
 
 class TaskRun(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    task_id = db.Column(db.Integer, db.ForeignKey('Task.id'), nullable=False)
+    task_id = db.Column(db.Integer, db.ForeignKey('task.id'), nullable=False)
     player_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    prim_sec_map_id = db.Column(db.Integer, db.ForeignKey('primarysecondarymapping.id'),
+    prim_sec_map_id = db.Column(db.Integer, db.ForeignKey('primary_secondary_mapping.id'),
                                 nullable=False)
     related = db.Column(db.Boolean, nullable=False)
 
