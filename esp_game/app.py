@@ -1,17 +1,19 @@
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 # Imports
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 
 import logging
 from logging import Formatter, FileHandler
 
 from flask import render_template, request
+from flask_login import login_user, login_required, logout_user, current_user
 
 from esp_game import app
+import esp_game.api_functions as func
 from esp_game.models import init_db
 from esp_game.forms import *
 
-#db = SQLAlchemy(app)
+# db = SQLAlchemy(app)
 
 # Automatically tear down SQLAlchemy.
 '''
@@ -32,9 +34,11 @@ def login_required(test):
             return redirect(url_for('login'))
     return wrap
 '''
-#----------------------------------------------------------------------------#
+
+
+# ----------------------------------------------------------------------------#
 # Controllers.
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 
 #
 #
@@ -46,36 +50,51 @@ def login_required(test):
 def about():
     return render_template('pages/placeholder.about.html')
 
+
 @app.route('/')
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    form = LoginForm(request.form)
-    return render_template('forms/login.html', form=form)
+    form = RegisterForm(request.form)
+    return func.login(form, login_user)
+
+
+@login_required
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    form = RegisterForm(request.form)
+    return func.logout(current_user, logout_user, form)
 
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm(request.form)
-    return render_template('forms/register.html', form=form)
+    return func.register(form)
+    # return render_template('forms/register.html', form=form)
 
+@app.route('/task', methods=['GET', 'POST'])
+def task():
+    print current_user
+    return current_user.email
 
 @app.route('/forgot')
 def forgot():
     form = ForgotForm(request.form)
     return render_template('forms/forgot.html', form=form)
 
+
 # Error handlers.
 
 
 @app.errorhandler(500)
 def internal_error(error):
-    #db_session.rollback()
+    # db_session.rollback()
     return render_template('errors/500.html'), 500
 
 
 @app.errorhandler(404)
 def not_found_error(error):
     return render_template('errors/404.html'), 404
+
 
 if not app.debug:
     file_handler = FileHandler('error.log')
@@ -87,12 +106,11 @@ if not app.debug:
     app.logger.addHandler(file_handler)
     app.logger.info('errors')
 
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 # Launch.
-#----------------------------------------------------------------------------#
+# ----------------------------------------------------------------------------#
 
 # Default port:
 if __name__ == '__main__':
     init_db()
     app.run(use_reloader=True)
-
