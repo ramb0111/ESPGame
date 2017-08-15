@@ -43,11 +43,6 @@ ESP-Game App
   postgres=# \q
   ```
 
-7. Insert Data into the database
-  ```
-   $ psql game -f /path/to/game_db.sql
-   ```
-
 7. Copy paste the Database credentials to ~/.bashrc:
   ```
     export GM_DB_USER='tester'
@@ -66,6 +61,11 @@ ESP-Game App
   ```
   $ python app.py
   ```
+
+7. Insert Data into the database
+  ```
+   $ psql game -f /path/to/game_db.sql
+   ```
 
 6. Navigate to [http://localhost:5000](http://localhost:5000)
 
