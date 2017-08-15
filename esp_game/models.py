@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from enum import Enum
 
 from esp_game import db
@@ -18,28 +18,28 @@ class User(db.Model):
         self.name = name
         self.email = email
         self.password = password
-        self.created_on = datetime.datetime()
-        self.updated_on = datetime.datetime()
+        self.created_on = datetime.now()
+        self.updated_on = datetime.now()
 
 
 class PrimaryImage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    url = db.Column(db.String(1000), nullable=False)
+    url = db.Column(db.String(1000), unique=True, nullable=False)
     created_on = db.Column(db.DateTime, nullable=False)
 
     def __init__(self, url):
         self.url = url
-        self.created_on = datetime.datetime()
+        self.created_on = datetime.now()
 
 
 class SecondaryImage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    url = db.Column(db.String(1000), nullable=False)
+    url = db.Column(db.String(1000), unique=True, nullable=False)
     created_on = db.Column(db.DateTime, nullable=False)
 
     def __init__(self, url):
         self.url = url
-        self.created_on = datetime.datetime()
+        self.created_on = datetime.now()
 
 
 class Task(db.Model):
@@ -53,7 +53,7 @@ class Task(db.Model):
 
     def __init__(self, player_id):
         self.status = 'init'
-        self.created_on = datetime.datetime()
+        self.created_on = datetime.now()
         self.player1_id = player_id
 
 
@@ -63,10 +63,9 @@ class PrimarySecondaryMapping(db.Model):
     secondary_id = db.Column(db.Integer, db.ForeignKey('secondary_image.id'))
     related_votes = db.Column(db.Integer, nullable=False, default=0)
 
-    def __init__(self, primary_id, secondary_id, related_votes):
+    def __init__(self, primary_id, secondary_id):
         self.primary_id = primary_id
         self.secondary_id = secondary_id
-        self.related_votes = related_votes
 
 
 class TaskRun(db.Model):
@@ -86,3 +85,7 @@ class TaskRun(db.Model):
 
 def init_db():
     db.create_all()
+
+
+if __name__ == '__main__':
+    print 'hello'
