@@ -38,7 +38,7 @@ ESP-Game App
 6. Create Database and User:
   ```
   postgres=# CREATE DATABASE game;
-  postgres=# CREATE USER tester WITH PASSWORD 'password';
+  postgres=# CREATE USER tester WITH PASSWORD 'password' SUPERUSER CREATEDB;
   postgres=# GRANT ALL PRIVILEGES ON DATABASE game to tester;
   postgres=# \q
   ```
