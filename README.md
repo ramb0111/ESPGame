@@ -43,6 +43,11 @@ ESP-Game App
   postgres=# \q
   ```
 
+7. Insert Data into the database
+  ```
+   psql game -f /path/to/game_db.sql
+   ```
+
 7. Copy paste the Database credentials to ~/.bashrc:
   ```
     export GM_DB_USER='tester'
