@@ -6,7 +6,7 @@ from esp_game import db
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.Integer, nullable=False)
+    name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100), nullable=False)
     created_on = db.Column(db.DateTime, nullable=False)
@@ -20,6 +20,22 @@ class User(db.Model):
         self.password = password
         self.created_on = datetime.now()
         self.updated_on = datetime.now()
+
+    def is_active(self):
+        """Gives user status"""
+        return self.active
+
+    def get_id(self):
+        """Return the email address to satisfy Flask-Login's requirements."""
+        return self.email
+
+    def is_authenticated(self):
+        """Return True as the user is by default authenticated."""
+        return True
+
+    def is_anonymous(self):
+        """False, as anonymous users aren't supported."""
+        return False
 
 
 class PrimaryImage(db.Model):
