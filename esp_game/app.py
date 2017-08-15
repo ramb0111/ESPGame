@@ -69,12 +69,28 @@ def logout():
 def register():
     form = RegisterForm(request.form)
     return func.register(form)
-    # return render_template('forms/register.html', form=form)
+
 
 @app.route('/task', methods=['GET', 'POST'])
 def task():
-    print current_user
-    return current_user.email
+    return func.task(current_user)
+
+
+@app.route('/task/run', methods=['GET', 'POST'])
+def taskrun():
+    task_id = int(request.form.get('task_id'))
+    return func.get_task(task_id, current_user)
+
+
+@app.route('/task/save', methods=['GET', 'POST'])
+def tasksave():
+    print request.form
+    task_id = int(request.form.get('task_id'))
+    primary_id = int(request.form.get('primary_id'))
+    secondary_ids = request.form.getlist('secondary_ids')
+    print secondary_ids
+    return func.task_save(task_id, current_user, primary_id, secondary_ids)
+
 
 @app.route('/forgot')
 def forgot():
