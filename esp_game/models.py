@@ -2,6 +2,7 @@ from datetime import datetime
 from enum import Enum
 
 from esp_game import db
+from esp_game import helper as hl
 
 
 class User(db.Model):
@@ -64,13 +65,15 @@ class Task(db.Model):
     player2_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     player1_answer_count = db.Column(db.Integer, nullable=False, default=0)
     player2_answer_count = db.Column(db.Integer, nullable=False, default=0)
-    status = db.Column(db.Enum(Enum('init', 'success', 'fail')), nullable=False, default=True)
+    primary_images_id = db.Column(db.String(1000))
+    status = db.Column(db.Enum('init', 'success', 'fail', name='task_enum'), nullable=False,
+                       default='init')
     created_on = db.Column(db.DateTime, nullable=False)
 
     def __init__(self, player_id):
-        self.status = 'init'
         self.created_on = datetime.now()
         self.player1_id = player_id
+        self.primary_images_id = hl.get_random_primary_images()
 
 
 class PrimarySecondaryMapping(db.Model):
@@ -88,20 +91,19 @@ class TaskRun(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     task_id = db.Column(db.Integer, db.ForeignKey('task.id'), nullable=False)
     player_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    prim_sec_map_id = db.Column(db.Integer, db.ForeignKey('primary_secondary_mapping.id'),
-                                nullable=False)
-    related = db.Column(db.Boolean, nullable=False)
+    primary_id = db.Column(db.Integer, db.ForeignKey('primary_image.id'),nullable=False)
+    related = db.Column(db.String(1000), nullable=False)
 
-    def __init__(self, task_id, player_id, prim_sec_map_id, related):
+    def __init__(self, task_id, player_id, primary_id, related):
         self.player_id = player_id
         self.task_id = task_id
-        self.prim_sec_map_id = prim_sec_map_id
+        self.primary_id = primary_id
         self.related = related
 
 
 def init_db():
     db.create_all()
 
-
-if __name__ == '__main__':
-    print 'hello'
+#
+# if __name__ == '__main__':
+#     db.session.commit()
