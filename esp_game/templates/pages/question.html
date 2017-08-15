@@ -1,10 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>heyyyyyy</title>
-</head>
-<body>
+{% extends 'layouts/form.html' %}
+{% block title %}Question{% endblock %}
+{% block content %}
 
-</body>
-</html>
+<div class="page-header">
+  <h3>Primary Image</h3>
+</div>
+<div><img src="{{ url[1] }}" width="250" height="250"></div>
+<div></div>
+<br><br>
+
+<form method="post" class="form" action="/task/save">
+    <h3 class="form-heading">Secondary Images</h3>
+    {% for secondary_url in urls %}
+     <input type="checkbox" value = "{{ secondary_url[0] }}" name = "secondary_ids">
+    <div><img src="{{ secondary_url[1] }}" width="250" height="250"  style="display:block"></div>
+    {% endfor %}
+     <input type="hidden" name="task_id" value="{{ task_id }} ">
+     <input type="hidden" name="primary_id" value="{{ url[0] }} ">
+    <input type="submit" value="Submit" class="btn btn-primary btn-lg btn-block">
+</form>
+
+<br>
+
+{% endblock %}
+
+
