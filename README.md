@@ -10,8 +10,8 @@ ESP-Game App
 
 1. Clone the repo
   ```
-  $ git clone https://github.com/mjhea0/flask-boilerplate.git
-  $ cd flask-boilerplate
+  $ git clone https://github.com/ramb0111/ESPGame.git
+  $ cd ESPGame
   ```
 
 2. Initialize and activate a virtualenv:
@@ -25,11 +25,13 @@ ESP-Game App
   ```
   $ pip install -r requirements.txt
   ```
+
 4. Install Postgresql:
   ```
   $ sudo apt-get update
   $ sudo apt-get install postgresql postgresql-contrib
   ```
+
 5. Launch Postgresql Shell:
   ```
   $ sudo -i -u postgres psql
@@ -57,16 +59,16 @@ ESP-Game App
   $ source ~/.bashrc
   ```
 
-5. Run the development server:
+9. Run the development server:
   ```
   $ python app.py
   ```
 
-7. Insert Data into the database
+10. Insert Data into the database
   ```
-   $ psql game -f /path/to/game_db.sql
-   ```
+  $ psql game -f /path/to/game_db.sql
+  ```
 
-6. Navigate to [http://localhost:5000](http://localhost:5000)
+11. Navigate to [http://localhost:5000](http://localhost:5000)
 
 
