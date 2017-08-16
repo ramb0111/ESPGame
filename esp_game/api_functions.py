@@ -15,6 +15,12 @@ def user_loader(user_email):
 
 
 def register(form):
+    """
+    Function to register the user.
+    :param form: Form containing user name , email and password
+    :return: Renders template for login if successfull else renders register page with error
+    message
+    """
     if request.method == 'GET':
         return render_template('forms/register.html', form=form)
     elif request.method == 'POST':
@@ -34,6 +40,14 @@ def register(form):
 
 
 def login(form, login_user):
+    """
+    Function to login the user
+    :param form: Form containing user email and password
+    :param login_user: login_user function from flask-login to update
+           about the new user
+    :return: Renders template for start game if successfull else renders login page with error
+    message
+    """
     if request.method == 'GET':
         return render_template('forms/login.html', form=form)
     elif request.method == 'POST':
@@ -50,7 +64,12 @@ def login(form, login_user):
 
 
 def logout(current_user, logout_user, form):
-    """Logout the current user."""
+    """
+    Function to logout the current user
+    :param current_user: Current user provided by flask-login
+    :param logout_user: logout user function from flask-login to logout the current user
+    :return: Renders template for login
+    """
     user = current_user
     user.active = False
     db.session.add(user)
@@ -60,6 +79,13 @@ def logout(current_user, logout_user, form):
 
 
 def task(current_user):
+    """
+    Function to return a new task or an existing task.
+    If player 1 is already assigned , returns an existing task
+    else returns a new task
+    :param current_user: Current user provided by flask
+    :return: Task id and current user
+    """
     task = Task.query.filter(Task.player2_id == None).first()
     if task:
         if current_user.id != task.player1_id:
@@ -68,13 +94,20 @@ def task(current_user):
             task = Task(current_user.id)
     else:
         task = Task(current_user.id)
-    print task.player1_id , task.player2_id
     db.session.add(task)
     db.session.commit()
     return get_task(task.id, current_user)
 
 
+# This Function can be broken down into smaller functions but because of
+# time constraint , i am leaving it for now
 def get_task(task_id, current_user):
+    """
+    Function to return a primary image and its seconday corresponding to the task
+    :param task_id: Id of the task
+    :param current_user: Current user provided by flask-login
+    :return: Renders a page containing primary images and secondary images
+    """
     task = Task.query.get(task_id)
     if current_user.id == task.player1_id:
         primary_image_id = task.primary_images_id.split(' ')[task.player1_answer_count]
@@ -93,7 +126,25 @@ def get_task(task_id, current_user):
                            url=primary_url[0])
 
 
+# This Function can be broken down into smaller functions but because of
+# time constraint , i am leaving it for now
 def task_save(task_id, current_user, primary_id, secondary_ids):
+    """
+    Function to save the user's set of selected secondary images.
+    This function performs a few more tasks like:
+    1> Updates the total answer count for a particular task by current user
+    2> Updates the related_votes for primary-seconday image mapping.
+       we will be using this mapping to show the related seconday images first
+    3> Updates the user point if seconday images are same
+    4> Saves the seconday image ids for a task's primary image
+
+    :param task_id: Id of the task
+    :param current_user:  Current user provided by flask-login
+    :param primary_id: Primary image id
+    :param secondary_ids: List of secondary images id selected by user
+    :return: if last primary image , takes up to the start game page else
+     Renders a page containing primary and secondary images
+    """
     task = Task.query.get(task_id)
     if current_user.id == task.player1_id:
         task.player1_answer_count += 1
@@ -107,7 +158,6 @@ def task_save(task_id, current_user, primary_id, secondary_ids):
                                                     TaskRun.task_id == task.id,
                                                     TaskRun.primary_id == primary_id).first()
     if task_run_by_other_player:
-        print set(secondary_ids), set(task_run_by_other_player.related.split(' '))
         if set(secondary_ids) == set(task_run_by_other_player.related.split(' ')):
             user = current_user
             user.points += 1
