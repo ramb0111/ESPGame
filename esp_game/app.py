@@ -13,28 +13,6 @@ import esp_game.api_functions as func
 from esp_game.models import init_db
 from esp_game.forms import *
 
-# db = SQLAlchemy(app)
-
-# Automatically tear down SQLAlchemy.
-'''
-@app.teardown_request
-def shutdown_session(exception=None):
-    db_session.remove()
-'''
-
-# Login required decorator.
-'''
-def login_required(test):
-    @wraps(test)
-    def wrap(*args, **kwargs):
-        if 'logged_in' in session:
-            return test(*args, **kwargs)
-        else:
-            flash('You need to login first.')
-            return redirect(url_for('login'))
-    return wrap
-'''
-
 
 # ----------------------------------------------------------------------------#
 # Controllers.
