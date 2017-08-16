@@ -39,6 +39,9 @@ def register(form):
                                    message="User Created")
 
 
+
+
+
 def login(form, login_user):
     """
     Function to login the user
@@ -63,6 +66,9 @@ def login(form, login_user):
                                    message="User not exist")
 
 
+
+
+
 def logout(current_user, logout_user, form):
     """
     Function to logout the current user
@@ -76,6 +82,9 @@ def logout(current_user, logout_user, form):
     db.session.commit()
     logout_user()
     return render_template("forms/login.html", form=form)
+
+
+
 
 
 def task(current_user):
@@ -99,6 +108,15 @@ def task(current_user):
     return get_task(task.id, current_user)
 
 
+
+
+
+
+
+
+
+
+
 # This Function can be broken down into smaller functions but because of
 # time constraint , i am leaving it for now
 def get_task(task_id, current_user):
@@ -119,11 +137,16 @@ def get_task(task_id, current_user):
         filter_by(id=primary_image_id)
     secondary_images_id = PrimarySecondaryMapping.query.with_entities(
         PrimarySecondaryMapping.secondary_id).filter_by(primary_id=primary_image_id)
-    secondary_urls = SecondaryImage.query.with_entities(SecondaryImage.id,
-                                                        SecondaryImage.url).filter(
-        SecondaryImage.id.in_(secondary_images_id)).all()
+    secondary_urls = SecondaryImage.query\
+        .with_entities(SecondaryImage.id,SecondaryImage.url)\
+        .filter(SecondaryImage.id.in_(secondary_images_id))\
+        .all()
     return render_template("pages/question.html", task_id=task.id, urls=secondary_urls,
                            url=primary_url[0])
+
+
+
+
 
 
 # This Function can be broken down into smaller functions but because of
@@ -164,16 +187,18 @@ def task_save(task_id, current_user, primary_id, secondary_ids):
             other_user = User.query.get(task_run_by_other_player.player_id)
             other_user.points += 1
             for id in secondary_ids:
-                pr_sec_mapping = PrimarySecondaryMapping.query.filter_by(primary_id=primary_id, secondary_id=int(id)).first()
+                pr_sec_mapping = PrimarySecondaryMapping.query.filter_by(primary_id=primary_id,
+                                                                         secondary_id=int(
+                                                                             id)).first()
                 pr_sec_mapping.related_votes += 1
                 db.session.add(pr_sec_mapping)
             db.session.add(other_user)
             db.session.add(user)
     task_run = TaskRun(task.id, current_user.id, primary_id, secondary_ids_str)
     db.session.add(task_run)
-    if (current_user.id == task.player1_id and task.player1_answer_count == cons.TASK_IMAGES_COUNT)\
+    if (current_user.id == task.player1_id and task.player1_answer_count == cons.TASK_IMAGES_COUNT) \
             or \
-        (current_user.id == task.player2_id and task.player2_answer_count == cons.TASK_IMAGES_COUNT):
+       (current_user.id == task.player2_id and task.player2_answer_count == cons.TASK_IMAGES_COUNT):
         task.status = 'success'
         db.session.add(task)
         db.session.commit()
