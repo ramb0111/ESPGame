@@ -18,17 +18,6 @@ from esp_game.forms import *
 # Controllers.
 # ----------------------------------------------------------------------------#
 
-#
-#
-# def home():
-#     return render_template('pages/placeholder.home.html')
-
-
-@app.route('/about')
-def about():
-    return render_template('pages/placeholder.about.html')
-
-
 @app.route('/')
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -62,18 +51,11 @@ def taskrun():
 
 @app.route('/task/save', methods=['GET', 'POST'])
 def tasksave():
-    print request.form
     task_id = int(request.form.get('task_id'))
     primary_id = int(request.form.get('primary_id'))
     secondary_ids = request.form.getlist('secondary_ids')
-    print secondary_ids
     return func.task_save(task_id, current_user, primary_id, secondary_ids)
 
-
-@app.route('/forgot')
-def forgot():
-    form = ForgotForm(request.form)
-    return render_template('forms/forgot.html', form=form)
 
 
 # Error handlers.

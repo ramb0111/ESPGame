@@ -94,7 +94,6 @@ def task(current_user):
             task = Task(current_user.id)
     else:
         task = Task(current_user.id)
-    print task.player1_id , task.player2_id
     db.session.add(task)
     db.session.commit()
     return get_task(task.id, current_user)
@@ -159,7 +158,6 @@ def task_save(task_id, current_user, primary_id, secondary_ids):
                                                     TaskRun.task_id == task.id,
                                                     TaskRun.primary_id == primary_id).first()
     if task_run_by_other_player:
-        print set(secondary_ids), set(task_run_by_other_player.related.split(' '))
         if set(secondary_ids) == set(task_run_by_other_player.related.split(' ')):
             user = current_user
             user.points += 1
