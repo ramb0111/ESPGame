@@ -1,6 +1,7 @@
 ## Welcome
 
 ESP-Game App
+Please be connected to the internet while playing the game because images are http urls
 
 ### Submitted To
 
@@ -28,6 +29,7 @@ ESP-Game App
 
 4. Install Postgresql:
   ```
+  Installation commands for postgresql in ubuntu
   $ sudo apt-get update
   $ sudo apt-get install postgresql postgresql-contrib
   ```
@@ -61,7 +63,7 @@ ESP-Game App
 
 9. Run the development server:
   ```
-  $ python app.py
+  $ python esp_game/app.py
   ```
 
 10. Insert Data into the database
