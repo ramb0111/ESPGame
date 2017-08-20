@@ -1,6 +1,7 @@
 ## Welcome
 
-ESP-Game App
+ESP-Game App:
+
 Please be connected to the internet while playing the game because images are http urls
 
 ### Submitted To
