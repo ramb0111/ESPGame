@@ -1,8 +1,9 @@
 from datetime import datetime
-from enum import Enum
+from random import sample
 
 from esp_game import db
-from esp_game import helper as hl
+from esp_game import constants as cons
+
 
 
 class User(db.Model):
@@ -70,10 +71,12 @@ class Task(db.Model):
                        default='init')
     created_on = db.Column(db.DateTime, nullable=False)
 
+    task_run_rel = db.relationship('TaskRun', cascade='all,delete', backref='task')
+
     def __init__(self, player_id):
         self.created_on = datetime.now()
         self.player1_id = player_id
-        self.primary_images_id = hl.get_random_primary_images()
+        self.primary_images_id = get_random_primary_images()
 
 
 class PrimarySecondaryMapping(db.Model):
@@ -102,8 +105,16 @@ class TaskRun(db.Model):
 
 
 def init_db():
+    """
+    Function to create all the tables into the database
+    """
     db.create_all()
 
-#
-# if __name__ == '__main__':
-#     db.session.commit()
+
+def get_random_primary_images():
+    """
+    Function to return string containing 5 random ids from primary image table.
+    :return: String containing 5 primary images id
+    """
+    random_list = sample(xrange(1, cons.PRIMARY_IMAGES_COUNT + 1), cons.TASK_IMAGES_COUNT)
+    return " ".join(map(str, random_list))
