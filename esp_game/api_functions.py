@@ -3,7 +3,7 @@ from flask import render_template, request
 import constants as cons
 from models import *
 from esp_game import db, login_manager
-
+from esp_game import helper as hl
 
 @login_manager.user_loader
 def user_loader(user_email):
@@ -39,9 +39,6 @@ def register(form):
                                    message="User Created")
 
 
-
-
-
 def login(form, login_user):
     """
     Function to login the user
@@ -66,9 +63,6 @@ def login(form, login_user):
                                    message="User not exist")
 
 
-
-
-
 def logout(current_user, logout_user, form):
     """
     Function to logout the current user
@@ -84,9 +78,6 @@ def logout(current_user, logout_user, form):
     return render_template("forms/login.html", form=form)
 
 
-
-
-
 def task(current_user):
     """
     Function to return a new task or an existing task.
@@ -95,113 +86,59 @@ def task(current_user):
     :param current_user: Current user provided by flask
     :return: Task id and current user
     """
+    hl.delete_task_if_not_completed(db, current_user)
     task = Task.query.filter(Task.player2_id == None).first()
     if task:
         if current_user.id != task.player1_id:
             task.player2_id = current_user.id
-        elif current_user.id == task.player1_id and task.player1_answer_count == 5:
+            db.session.add(task)
+        else:
             task = Task(current_user.id)
+            db.session.add(task)
     else:
         task = Task(current_user.id)
-    db.session.add(task)
+        db.session.add(task)
     db.session.commit()
     return get_task(task.id, current_user)
 
 
-
-
-
-
-
-
-
-
-
-# This Function can be broken down into smaller functions but because of
-# time constraint , i am leaving it for now
 def get_task(task_id, current_user):
     """
-    Function to return a primary image and its seconday corresponding to the task
+    Function to return a primary image and its secondary images for a task
     :param task_id: Id of the task
     :param current_user: Current user provided by flask-login
     :return: Renders a page containing primary images and secondary images
     """
     task = Task.query.get(task_id)
-    if current_user.id == task.player1_id:
-        primary_image_id = task.primary_images_id.split(' ')[task.player1_answer_count]
-    elif current_user.id == task.player2_id:
-        primary_image_id = task.primary_images_id.split(' ')[task.player2_answer_count]
-    else:
-        raise Exception('Unauthorised User')
+    primary_image_id = hl.get_primary_image_id_from_task(task, current_user)
     primary_url = PrimaryImage.query.with_entities(PrimaryImage.id, PrimaryImage.url). \
         filter_by(id=primary_image_id)
-    secondary_images_id = PrimarySecondaryMapping.query.with_entities(
-        PrimarySecondaryMapping.secondary_id).filter_by(primary_id=primary_image_id)
-    secondary_urls = SecondaryImage.query\
-        .with_entities(SecondaryImage.id,SecondaryImage.url)\
-        .filter(SecondaryImage.id.in_(secondary_images_id))\
-        .all()
-    return render_template("pages/question.html", task_id=task.id, urls=secondary_urls,
+
+    secondary_id_urls_dict = hl.get_scndry_img_id_url_dict(primary_image_id)
+    sorted_scndry_id_url_list = hl.get_sorted_imgs_dict(task, current_user, primary_image_id,
+                                                        secondary_id_urls_dict)
+    return render_template("pages/question.html", task_id=task.id, urls=sorted_scndry_id_url_list,
                            url=primary_url[0])
 
 
-
-
-
-
-# This Function can be broken down into smaller functions but because of
-# time constraint , i am leaving it for now
 def task_save(task_id, current_user, primary_id, secondary_ids):
     """
     Function to save the user's set of selected secondary images.
-    This function performs a few more tasks like:
-    1> Updates the total answer count for a particular task by current user
-    2> Updates the related_votes for primary-seconday image mapping.
-       we will be using this mapping to show the related seconday images first
-    3> Updates the user point if seconday images are same
-    4> Saves the seconday image ids for a task's primary image
-
     :param task_id: Id of the task
     :param current_user:  Current user provided by flask-login
-    :param primary_id: Primary image id
+    :param primary_id: Id of Primary image
     :param secondary_ids: List of secondary images id selected by user
     :return: if last primary image , takes up to the start game page else
      Renders a page containing primary and secondary images
     """
     task = Task.query.get(task_id)
-    if current_user.id == task.player1_id:
-        task.player1_answer_count += 1
-    elif current_user.id == task.player2_id:
-        task.player2_answer_count += 1
-    else:
-        raise Exception('Unauthorised User')
-    db.session.add(task)
+    hl.update_answer_count_for_player(task, current_user, db)
+    task_run_by_other_player = hl.get_other_user_taskrun(task, current_user, primary_id)
+    hl.update_user_points(db, task_run_by_other_player, current_user, secondary_ids, primary_id)
     secondary_ids_str = " ".join(map(str, secondary_ids))
-    task_run_by_other_player = TaskRun.query.filter(TaskRun.player_id != current_user.id,
-                                                    TaskRun.task_id == task.id,
-                                                    TaskRun.primary_id == primary_id).first()
-    if task_run_by_other_player:
-        if set(secondary_ids) == set(task_run_by_other_player.related.split(' ')):
-            user = current_user
-            user.points += 1
-            other_user = User.query.get(task_run_by_other_player.player_id)
-            other_user.points += 1
-            for id in secondary_ids:
-                pr_sec_mapping = PrimarySecondaryMapping.query.filter_by(primary_id=primary_id,
-                                                                         secondary_id=int(
-                                                                             id)).first()
-                pr_sec_mapping.related_votes += 1
-                db.session.add(pr_sec_mapping)
-            db.session.add(other_user)
-            db.session.add(user)
     task_run = TaskRun(task.id, current_user.id, primary_id, secondary_ids_str)
     db.session.add(task_run)
-    if (current_user.id == task.player1_id and task.player1_answer_count == cons.TASK_IMAGES_COUNT) \
-            or \
-       (current_user.id == task.player2_id and task.player2_answer_count == cons.TASK_IMAGES_COUNT):
-        task.status = 'success'
-        db.session.add(task)
-        db.session.commit()
+    if hl.update_task_status(current_user, task, db):
         return render_template("pages/start_game.html")
     db.session.commit()
     return get_task(task_id, current_user)
