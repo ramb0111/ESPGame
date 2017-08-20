@@ -26,7 +26,7 @@ def login():
 
 
 @login_required
-@app.route('/logout', methods=['GET', 'POST'])
+@app.route('/logout', methods=['GET'])
 def logout():
     form = RegisterForm(request.form)
     return func.logout(current_user, logout_user, form)
