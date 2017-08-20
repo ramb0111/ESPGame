@@ -64,8 +64,6 @@ def get_sorted_imgs_dict(task, current_user, prm_image_id, scndry_imgs_id_url_di
         imgs_selctd_by_othr_user = map(int, other_user_task_run.related.split(' '))
     imgs_not_selctd_by_othr_user = list(
         set(scndry_imgs_id_url_dict.keys()) - set(imgs_selctd_by_othr_user))
-    print imgs_selctd_by_othr_user , imgs_not_selctd_by_othr_user
-    print get_sortd_scndry_imgs_by_previous_votes(imgs_selctd_by_othr_user), get_sortd_scndry_imgs_by_previous_votes(imgs_not_selctd_by_othr_user)
     sorted_imgs = get_sortd_scndry_imgs_by_previous_votes(imgs_selctd_by_othr_user)
     sorted_imgs.extend(get_sortd_scndry_imgs_by_previous_votes(imgs_not_selctd_by_othr_user))
 
