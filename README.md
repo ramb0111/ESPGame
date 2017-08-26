@@ -25,7 +25,7 @@ Please be connected to the internet while playing the game because images are ht
 
 3. Install the dependencies:
   ```
-  $ pip install -r requirements.txt
+  $ pip install -r esp_game/requirements.txt
   ```
 
 4. Install Postgresql:
