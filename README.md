@@ -4,10 +4,6 @@ ESP-Game App:
 
 Please be connected to the internet while playing the game because images are http urls
 
-### Submitted To
-
-![squad-run-logo](https://squadrun.co/wp-content/uploads/2016/10/sr-fb.png)
-
 ### Quick Start
 
 1. Clone the repo
