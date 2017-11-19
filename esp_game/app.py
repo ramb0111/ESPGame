@@ -7,7 +7,8 @@ from logging import Formatter, FileHandler
 
 from flask import render_template, request
 from flask_login import login_user, login_required, logout_user, current_user
-
+import sys, os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from esp_game import app
 import esp_game.api_functions as func
 from esp_game.models import init_db
