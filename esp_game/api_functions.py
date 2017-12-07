@@ -25,9 +25,9 @@ def register(form):
         return render_template('forms/register.html', form=form)
     elif request.method == 'POST':
         email = form.email.data
-        if not email.endswith(tuple(['@gmail.com', '@squadrun.com'])):
+        if not email.endswith(tuple(['@gmail.com'])):
             return render_template('forms/register.html', form=form,
-                                   message="Domain must be gmail.com or squadrun.com")
+                                   message="Domain must be gmail.com")
         if User.query.filter_by(email=form.email.data).first():
             return render_template('forms/register.html', form=form,
                                    message="Email address already exists")
@@ -86,18 +86,10 @@ def task(current_user):
     :param current_user: Current user provided by flask
     :return: Task id and current user
     """
-    hl.delete_task_if_not_completed(db, current_user)
-    task = Task.query.filter(Task.player2_id == None).first()
-    if task:
-        if current_user.id != task.player1_id:
-            task.player2_id = current_user.id
-            db.session.add(task)
-        else:
-            task = Task(current_user.id)
-            db.session.add(task)
-    else:
-        task = Task(current_user.id)
-        db.session.add(task)
+    task = Task(current_user.id)
+    if task.primary_image_id == None:
+        raise Exception("All images are viewed")
+    db.session.add(task)
     db.session.commit()
     return get_task(task.id, current_user)
 
@@ -110,12 +102,12 @@ def get_task(task_id, current_user):
     :return: Renders a page containing primary images and secondary images
     """
     task = Task.query.get(task_id)
-    primary_image_id = hl.get_primary_image_id_from_task(task, current_user)
+    primary_image_id = task.primary_image_id
     primary_url = PrimaryImage.query.with_entities(PrimaryImage.id, PrimaryImage.url). \
         filter_by(id=primary_image_id)
 
     secondary_id_urls_dict = hl.get_scndry_img_id_url_dict(primary_image_id)
-    sorted_scndry_id_url_list = hl.get_sorted_imgs_dict(task, current_user, primary_image_id,
+    sorted_scndry_id_url_list = hl.get_sorted_imgs_dict(primary_image_id,
                                                         secondary_id_urls_dict)
     return render_template("pages/question.html", task_id=task.id, urls=sorted_scndry_id_url_list,
                            url=primary_url[0])
@@ -132,13 +124,13 @@ def task_save(task_id, current_user, primary_id, secondary_ids):
      Renders a page containing primary and secondary images
     """
     task = Task.query.get(task_id)
-    hl.update_answer_count_for_player(task, current_user, db)
-    task_run_by_other_player = hl.get_other_user_taskrun(task, current_user, primary_id)
-    hl.update_user_points(db, task_run_by_other_player, current_user, secondary_ids, primary_id)
+    # hl.update_answer_count_for_player(task, current_user, db)
+    # task_run_by_other_player = hl.get_other_user_taskrun(task, current_user, primary_id)
     secondary_ids_str = " ".join(map(str, secondary_ids))
-    task_run = TaskRun(task.id, current_user.id, primary_id, secondary_ids_str)
-    db.session.add(task_run)
-    if hl.update_task_status(current_user, task, db):
-        return render_template("pages/start_game.html")
+    task.secondary_images = secondary_ids_str
+    db.session.add(task)
+    hl.update_user_points(db, current_user, secondary_ids, primary_id)
     db.session.commit()
-    return get_task(task_id, current_user)
+    # if hl.update_task_status(current_user, task, db):
+    return render_template("pages/start_game.html")
+    # return get_task(task_id, current_user)
