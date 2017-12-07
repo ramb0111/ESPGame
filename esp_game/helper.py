@@ -2,38 +2,6 @@ import constants as cons
 from models import *
 
 
-# def get_primary_image_id_from_task(task, current_user):
-#     """
-#     Function to get id of the primary image from a given task object
-#     :param task: Task object created right after starting the game
-#     :param current_user: Current user provided by flask-login
-#     :return: Id of the primary image
-#     """
-#     if current_user.id == task.player1_id:
-#         primary_image_id = task.primary_images_id.split(' ')[task.player1_answer_count]
-#     elif current_user.id == task.player2_id:
-#         primary_image_id = task.primary_images_id.split(' ')[task.player2_answer_count]
-#     else:
-#         raise Exception('Unauthorised User')
-#     return primary_image_id
-
-
-# def update_answer_count_for_player(task, current_user, db):
-#     """
-#     Function to update the total answer count of the current player upto now
-#     :param task: Task object created right after starting the game
-#     :param current_user: Current user provided by flask-login
-#     :param db: SqlAlchemy object to update the current task
-#     """
-#     if current_user.id == task.player1_id:
-#         task.player1_answer_count += 1
-#     elif current_user.id == task.player2_id:
-#         task.player2_answer_count += 1
-#     else:
-#         raise Exception('Unauthorised User')
-#     db.session.add(task)
-
-
 def get_sortd_scndry_imgs_by_previous_votes(primary_id, scndry_imgs_id_list):
     """
     Function to return the sorted list of secondary images id on the basis
@@ -60,20 +28,6 @@ def get_sorted_imgs_dict(prm_image_id, scndry_imgs_id_url_dict):
     """
     sorted_imgs = get_sortd_scndry_imgs_by_previous_votes(prm_image_id, scndry_imgs_id_url_dict)
     return [(img_id[0], scndry_imgs_id_url_dict[img_id[0]]) for img_id in sorted_imgs]
-
-#
-# def get_other_user_taskrun(task, current_user, primary_image_id):
-#     """
-#     Function to return the TaskRun object for the other user participated
-#     in the given task.
-#     :param task: Task object created right after starting the game
-#     :param current_user: Current user provided by flask-login
-#     :param primary_image_id: Id of the primary image
-#     :return: TaskRun object
-#     """
-#     return TaskRun.query.filter(TaskRun.player_id != current_user.id,
-#                                 TaskRun.task_id == task.id,
-#                                 TaskRun.primary_id == primary_image_id).first()
 
 
 def get_scndry_img_id_url_dict(primary_image_id):
@@ -151,35 +105,3 @@ def update_votes_for_scndry_imgs(db, scndry_ids, prm_id):
         pr_sec_mapping.related_votes += 1
         db.session.add(pr_sec_mapping)
 
-#
-# def update_task_status(current_user, task, db):
-#     """
-#     Function to update the status of the task to success , if current user
-#     answered all the 5 questions(i.e primary images)
-#     :param current_user: Current user provided by flask-login
-#     :param task: Task object created right after starting the game
-#     :param db: SqlAlchemy object to update the current task
-#     :return: Returns True if Task is successfully completed
-#     """
-#     if (current_user.id == task.player1_id and task.player1_answer_count == cons.TASK_IMAGES_COUNT) \
-#             or \
-#             (current_user.id == task.player2_id and task.player2_answer_count == cons.TASK_IMAGES_COUNT):
-#         task.status = 'success'
-#         db.session.add(task)
-#         db.session.commit()
-#         return True
-#     return False
-
-#
-#
-# def delete_task_if_not_completed(db, current_user):
-#     """
-#     Function to delete the task if not completed by the current user
-#     :param db: SqlAlchemy object to update the current task
-#     :param current_user: Current user provided by flask
-#     """
-#     task_not_completed = Task.query.filter(TaskRun.player_id == current_user.id,
-#                                            Task.player2_id == None,
-#                                            Task.player1_answer_count != 5).first()
-#     if task_not_completed:
-#         db.session.delete(task_not_completed)

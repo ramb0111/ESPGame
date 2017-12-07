@@ -124,13 +124,10 @@ def task_save(task_id, current_user, primary_id, secondary_ids):
      Renders a page containing primary and secondary images
     """
     task = Task.query.get(task_id)
-    # hl.update_answer_count_for_player(task, current_user, db)
-    # task_run_by_other_player = hl.get_other_user_taskrun(task, current_user, primary_id)
     secondary_ids_str = " ".join(map(str, secondary_ids))
     task.secondary_images = secondary_ids_str
     db.session.add(task)
     hl.update_user_points(db, current_user, secondary_ids, primary_id)
     db.session.commit()
-    # if hl.update_task_status(current_user, task, db):
     return render_template("pages/start_game.html")
-    # return get_task(task_id, current_user)
+

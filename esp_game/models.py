@@ -86,19 +86,6 @@ class PrimarySecondaryMapping(db.Model):
         self.secondary_id = secondary_id
 
 
-# class TaskRun(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     task_id = db.Column(db.Integer, db.ForeignKey('task.id'), nullable=False)
-#     player_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-#     primary_id = db.Column(db.Integer, db.ForeignKey('primary_image.id'),nullable=False)
-#     related =
-#
-#     def __init__(self, task_id, player_id, primary_id, related):
-#         self.player_id = player_id
-#         self.task_id = task_id
-#         self.primary_id = primary_id
-#         self.related = related
-
 
 def init_db():
     """
