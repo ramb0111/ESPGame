@@ -1,6 +1,6 @@
 from datetime import datetime
 from random import sample
-
+from flask_login import current_user
 from esp_game import db
 from esp_game import constants as cons
 
@@ -15,6 +15,7 @@ class User(db.Model):
     updated_on = db.Column(db.DateTime, nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
     points = db.Column(db.Integer, nullable=False, default=0)
+    primary_img_count = db.Column(db.Integer, nullable=False, default=0)
 
     def __init__(self, name, email, password):
         self.name = name
@@ -62,21 +63,16 @@ class SecondaryImage(db.Model):
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    player1_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    player2_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    player1_answer_count = db.Column(db.Integer, nullable=False, default=0)
-    player2_answer_count = db.Column(db.Integer, nullable=False, default=0)
-    primary_images_id = db.Column(db.String(1000))
-    status = db.Column(db.Enum('init', 'success', 'fail', name='task_enum'), nullable=False,
-                       default='init')
+    player_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    player_ans_in_set = db.Column(db.Boolean)
+    primary_image_id = db.Column(db.Integer,nullable=False)
     created_on = db.Column(db.DateTime, nullable=False)
-
-    task_run_rel = db.relationship('TaskRun', cascade='all,delete', backref='task')
+    secondary_images = db.Column(db.String(1000))
 
     def __init__(self, player_id):
         self.created_on = datetime.now()
-        self.player1_id = player_id
-        self.primary_images_id = get_random_primary_images()
+        self.player_id = player_id
+        self.primary_image_id = get_primary_image()
 
 
 class PrimarySecondaryMapping(db.Model):
@@ -90,18 +86,18 @@ class PrimarySecondaryMapping(db.Model):
         self.secondary_id = secondary_id
 
 
-class TaskRun(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    task_id = db.Column(db.Integer, db.ForeignKey('task.id'), nullable=False)
-    player_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    primary_id = db.Column(db.Integer, db.ForeignKey('primary_image.id'),nullable=False)
-    related = db.Column(db.String(1000), nullable=False)
-
-    def __init__(self, task_id, player_id, primary_id, related):
-        self.player_id = player_id
-        self.task_id = task_id
-        self.primary_id = primary_id
-        self.related = related
+# class TaskRun(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     task_id = db.Column(db.Integer, db.ForeignKey('task.id'), nullable=False)
+#     player_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+#     primary_id = db.Column(db.Integer, db.ForeignKey('primary_image.id'),nullable=False)
+#     related =
+#
+#     def __init__(self, task_id, player_id, primary_id, related):
+#         self.player_id = player_id
+#         self.task_id = task_id
+#         self.primary_id = primary_id
+#         self.related = related
 
 
 def init_db():
@@ -111,10 +107,19 @@ def init_db():
     db.create_all()
 
 
-def get_random_primary_images():
+def get_primary_image():
     """
     Function to return string containing 5 random ids from primary image table.
     :return: String containing 5 primary images id
     """
-    random_list = sample(xrange(1, cons.PRIMARY_IMAGES_COUNT + 1), cons.TASK_IMAGES_COUNT)
-    return " ".join(map(str, random_list))
+    print Task.query.with_entities(Task.primary_image_id)\
+                                    .filter(Task.player_id == current_user.id).all()
+    return PrimaryImage.query \
+        .with_entities(PrimaryImage.id) \
+        .filter(~PrimaryImage.id.in_(Task.query
+                                    .with_entities(Task.primary_image_id)
+                                    .filter(Task.player_id == current_user.id).all()
+                                    )
+               ) \
+        .first()
+
